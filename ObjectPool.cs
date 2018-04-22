@@ -1,13 +1,12 @@
-﻿/*  ╔═════════════════════════════╡  ObjectPool 2018 ╞══════════════════════════════╗            
-    ║ Authors:  Dmitrii Roets                       Email:    roetsd@icloud.com      ║
-    ╟────────────────────────────────────────────────────────────────────────────────╢░ 
-    ║ Purpose: This system is designed to replace standard Instantiation             ║░
-    ║          procedure and Destroy. The objects created via this system are        ║░
-    ║          recycled. Saves memory and performance.                               ║░
-    ║ Usage:   Use ObjectPool.InstantiateGameObject(somePrefab, position, rotation)  ║░
-    ║          and  ObjectPool.DestroyGameObject(someObject) to make objects you want║░                                                               
-    ╚════════════════════════════════════════════════════════════════════════════════╝░
-       ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+﻿/*  ╔═════════════════════════════════════════════╡  DinoTank - ObjectPool 2018 ╞═══════════════════════════════════════════════════════╗            
+    ║ Authors:  Dmitrii Roets                       Email:    roetsd@icloud.com                                                         ║
+    ╟───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╢░ 
+    ║ Purpose: This system is designed to replace standard Instantiation procedure and Destroy. The objects created via this system are ║░
+    ║          recycled. Saves memory and performance.                                                                                  ║░
+    ║ Usage:   Use ObjectPool.InstantiateGameObject(somePrefab, position, rotation) and  ObjectPool.DestroyGameObject(someObject) to    ║░
+    ║          make objects you want                                                                                                    ║░
+    ╚═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝░
+       ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
 */
 using System.Collections;
 using System.Collections.Generic;
@@ -16,7 +15,6 @@ using UnityEngine;
 [System.Serializable]
 public class ObjectPool : MonoBehaviour
 {
-
     public bool prewarmObjectPool = true;                               // Preload Objects into the pool at start ?
     public List<GameObject> prewarmedObjects = new List<GameObject>();  // List of objects to preload
     public List<GameObject> objects = new List<GameObject>();           // Primary Objects container
@@ -53,7 +51,6 @@ public class ObjectPool : MonoBehaviour
             return objectPool;
         }
     }
-
 
     void Awake()
     {
