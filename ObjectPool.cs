@@ -14,16 +14,17 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [System.Serializable]
-public class ObjectPool : MonoBehaviour {
-  
-    public bool prewarmObjectPool = true;
-    public List<GameObject> prewarmedObjects = new List<GameObject>();
-    public List<GameObject> objects = new List<GameObject>(); 
+public class ObjectPool : MonoBehaviour
+{
+
+    public bool prewarmObjectPool = true;                               // Preload Objects into the pool at start ?
+    public List<GameObject> prewarmedObjects = new List<GameObject>();  // List of objects to preload
+    public List<GameObject> objects = new List<GameObject>();           // Primary Objects container
 
     // Debugging 
-    public bool debugMode = true;
-    public List<string> objectsNames = new List<string>(); 
-    public List<int> used = new List<int>(); 
+    public bool debugMode = true;                                       // Keep track of spawned object names, uses and show objects destroyed outside of object pool
+    public List<string> objectsNames = new List<string>();              // List of names
+    public List<int> used = new List<int>();                            // list of uses
 
     // Singleton
     private static ObjectPool objectPool;
@@ -36,7 +37,7 @@ public class ObjectPool : MonoBehaviour {
                 objectPool = FindObjectOfType(typeof(ObjectPool)) as ObjectPool;
                 if (!objectPool)
                 {
-                    Debug.Log("Could not find EventManager in scene, will make one");
+                    Debug.Log("Could not find ObjectPool in scene, will make one");
                     GameObject manager = Instantiate(Resources.Load("Managers/ObjectPool", typeof(GameObject)) as GameObject);
                     if (manager)
                         objectPool = manager.GetComponent<ObjectPool>();
@@ -53,22 +54,20 @@ public class ObjectPool : MonoBehaviour {
         }
     }
 
-   
+
     void Awake()
     {
         if (objectPool == null)
-        {
             objectPool = this;
-        }
         else
-        {
             Destroy(gameObject);
-        }
         Init();
         transform.SetParent(null);
     }
-    
 
+    /// <summary>
+    /// Preloads objects if requested 
+    /// </summary>
     public void Init()
     {
         if (!prewarmObjectPool)
@@ -94,6 +93,13 @@ public class ObjectPool : MonoBehaviour {
         }
     }
 
+    /// <summary>
+    /// Replaces the Instantiate(GameObject); Will traverse the already created objects and return one if available, otherwise Instantiates a new one.   
+    /// No overload version
+    /// </summary>
+    /// <param name="_object">The Prefab to Instanatinate</param>
+    /// <param name="_activate">Return already activated?</param>
+    /// <returns>The Instance of the requested object.</returns>
     public static GameObject InstantiateGameObject(GameObject _object, bool _activate = true)
     {
         if (_object == null)
@@ -105,12 +111,12 @@ public class ObjectPool : MonoBehaviour {
         {
             if (instance.objects[i])
             {
-                if (!instance.objects[i].activeInHierarchy && instance.objects[i].name.Contains(_object.name))
+                if ((!instance.objects[i].activeInHierarchy) && (instance.objects[i].name == _object.name))
                 {
                     if (instance.debugMode)
-                    {
                         instance.used[i]++;
-                    }
+                    if (_activate)
+                        instance.objects[i].SetActive(true);
                     return instance.objects[i];
                 }
             }
@@ -122,7 +128,7 @@ public class ObjectPool : MonoBehaviour {
                 }
             }
         }
-         
+
         GameObject newObject = Instantiate(_object);
         newObject.name = _object.name;
         instance.objects.Add(newObject);
@@ -132,14 +138,24 @@ public class ObjectPool : MonoBehaviour {
             instance.objectsNames.Add(newObject.name + "_DYN");
             instance.used.Add(1);
         }
-
-        newObject.SetActive(_activate);
+        if (_activate)
+            newObject.SetActive(true);
 
         return newObject;
     }
-    public static GameObject InstantiateGameObject(GameObject _object, Vector3 _position, Quaternion _rotation)
+
+    /// <summary>
+    /// Replaces the Instantiate(GameObject); Will traverse the already created objects and return one if available, otherwise Instantiates a new one.   
+    /// No overload version
+    /// </summary>
+    /// <param name="_object">The Prefab to Instanatinate</param>
+    /// <param name="_position">World Position</param>
+    /// <param name="_rotation">World Rotation</param>
+    /// <param name="_activate">Return already activated?</param>
+    /// <returns>The Instance of the requested object.</returns>
+    public static GameObject InstantiateGameObject(GameObject _object, Vector3 _position, Quaternion _rotation, bool _activate = true)
     {
-      if(_object == null)
+        if (_object == null)
         {
             Debug.LogError("<Color=Maroon><b>ObjectPool</b></Color>: <Color=Yellow> null object </Color> fed to ObjectPool");
             return null;
@@ -149,17 +165,14 @@ public class ObjectPool : MonoBehaviour {
         {
             if (instance.objects[i])
             {
-                if (instance.objects[i].name.Contains(_object.name) && !instance.objects[i].activeInHierarchy)
+                if ((instance.objects[i].name == _object.name) && (!instance.objects[i].activeInHierarchy))
                 {
                     instance.objects[i].transform.position = _position;
                     instance.objects[i].transform.rotation = _rotation;
-                    instance.objects[i].SetActive(true);
-
                     if (instance.debugMode)
-                    {
                         instance.used[i]++;
-                    }
-
+                    if (_activate)
+                        instance.objects[i].SetActive(true);
                     return instance.objects[i];
                 }
             }
@@ -169,9 +182,9 @@ public class ObjectPool : MonoBehaviour {
         newObject.name = _object.name;
         newObject.transform.position = _position;
         newObject.transform.rotation = _rotation;
-        newObject.SetActive(true);
+        if (_activate)
+            newObject.SetActive(true);
         instance.objects.Add(newObject);
-
         if (instance.debugMode)
         {
             instance.objectsNames.Add(newObject.name + "_DYN");
@@ -180,27 +193,21 @@ public class ObjectPool : MonoBehaviour {
         return newObject;
     }
 
-    public static bool Contains(GameObject _object)
-    {
-        return instance.objects.Contains(_object);
-    }
+    /// <summary>
+    /// Replaces the Destroy(GameObject) function, will first determine if requested object is in the pool and deactivate. Otherwise Destroy.
+    /// </summary>
+    /// <param name="_obj">The object to destroy</param>
     public static void DestroyGameObject(GameObject _obj)
     {
         for (int i = 0; i < instance.objects.Count; i++)
         {
-            if (!instance.objects[i])
+            if (instance.objects[i] && instance.objects[i] == _obj)
             {
-            }
-            else
-            {
-                if (instance.objects[i] == _obj)
-                {
-                    _obj.transform.SetParent(null);
-                    _obj.SetActive(false);
-                    return;
-                }
+                _obj.transform.SetParent(null);
+                _obj.SetActive(false);
+                return;
             }
         }
-        Destroy(_obj); 
+        Destroy(_obj);
     }
 }
