@@ -1,4 +1,4 @@
-﻿/*  ╔════════════════════════════════╡  DinoTank 2018 ╞══════════════════════════════╗            
+﻿/*  ╔═════════════════════════════╡  ObjectPool 2018 ╞══════════════════════════════╗            
     ║ Authors:  Dmitrii Roets                       Email:    roetsd@icloud.com      ║
     ╟────────────────────────────────────────────────────────────────────────────────╢░ 
     ║ Purpose: This system is designed to replace standard Instantiation             ║░
@@ -104,7 +104,7 @@ public class ObjectPool : MonoBehaviour
     {
         if (_object == null)
         {
-            Debug.Log("<Color=Maroon><b>DinoError</b></Color>: <Color=Yellow>ObjectPool</Color> was instructed to make null object");
+            Debug.Log("<Color=Maroon><b>ObjectPool Error</b></Color>: <Color=Blue>Null object</Color> passed into instantiate");
             return null;
         }
         for (int i = 0; i < instance.objects.Count; i++)
@@ -157,7 +157,7 @@ public class ObjectPool : MonoBehaviour
     {
         if (_object == null)
         {
-            Debug.LogError("<Color=Maroon><b>ObjectPool</b></Color>: <Color=Yellow> null object </Color> fed to ObjectPool");
+            Debug.Log("<Color=Maroon><b>ObjectPool Error</b></Color>: <Color=Blue>Null object</Color> passed into instantiate");
             return null;
         }
 
