@@ -1,10 +1,10 @@
-﻿/*  ╔═════════════════════════════╡  DinoTank 2018 ╞════════════════════════════╗            
-    ║ Authors:  Dmitrii Roets                       Email:    roetsd@icloud.com ║
-    ╟───────────────────────────────────────────────────────────────────────────╢░ 
-    ║ Purpose:  Extends/overrides the functionality of ObjectPool script        ║░
-    ║ Usage:    This script must be in Editor folder                            ║░
-    ╚═══════════════════════════════════════════════════════════════════════════╝░
-       ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+﻿/*  ╔═════════════════════════════╡  DinoTank - Object Pool  2018 ╞════════════════════════════╗            
+    ║ Authors:  Dmitrii Roets                                      Email:    roetsd@icloud.com ║
+    ╟──────────────────────────────────────────────────────────────────────────────────────────╢░ 
+    ║ Purpose:  Extends/overrides the functionality of ObjectPool script                       ║░
+    ║ Usage:    This script must be in Editor folder                                           ║░
+    ╚══════════════════════════════════════════════════════════════════════════════════════════╝░
+       ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
 */
 using System.Collections;
 using System.Collections.Generic;
@@ -30,31 +30,37 @@ public class ObjectPoolEditor : Editor
         fieldWidth = EditorGUIUtility.fieldWidth;
 
         // ----------------------Begin Logic ---------------------------
-        objectPool.debugMode = EditorGUILayout.Toggle(new GUIContent("Debug Mode", "Log names and usage of objects?"), objectPool.debugMode);
-     
-        Heading1("Preloaded Objects", Color.yellow);
-        EditorGUILayout.PropertyField(serializedObject.FindProperty("prewarmedObjects"), new GUIContent("Prewarmed Objects", "List of objects to create at load"), true);
+
         EditorGUILayout.BeginVertical("box");
-        Heading1("Current Pooled Objects", Color.cyan);   
-        for (int i = 0; i < objectPool.objects.Count; i++)
+        objectPool.prewarmObjectPool = EditorGUILayout.ToggleLeft("Preload Objects into ObjectPool", objectPool.prewarmObjectPool);
+        if (objectPool.prewarmObjectPool)
         {
-            ShowObjectEntry(i, objectPool.objects[i], objectPool.objectsNames[i]);
-        }    
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("prewarmedObjects"), new GUIContent("Prewarmed Objects", "Prefabs to be created on start, duplicates allowed"), true);
+        }
         EditorGUILayout.EndVertical();
+
+        EditorGUILayout.BeginVertical("box");
+        Heading("Current Pooled Objects", Color.cyan);
+        for (int i = 0; i < objectPool.objects.Count; i++)
+            ShowObjectEntry(i, objectPool.objects[i], objectPool.objectsNames[i]);
+        if (objectPool.objects.Count == 0)
+            EditorGUILayout.LabelField("none");
+        EditorGUILayout.EndVertical();
+        objectPool.debugMode = EditorGUILayout.Toggle(new GUIContent("Debug Mode", "Log names and usage of objects?"), objectPool.debugMode);
 
         // ----------------------End Logic ---------------------------
         EditorGUIUtility.labelWidth = labelWidth;
         EditorGUIUtility.fieldWidth = fieldWidth;
         EditorGUILayout.Space();
         GUI.color = Color.magenta;
+        DrawUnderline(Color.black, 2);
         showInheritedvars = EditorGUILayout.Toggle("Show Full Script", showInheritedvars);
-        EditorGUILayout.LabelField("__________________________________________________");
         GUI.color = defBackgroundColor;
 
         if (showInheritedvars)
             DrawDefaultInspector();
 
-        EditorUtility.SetDirty(target);     
+        EditorUtility.SetDirty(target);
         serializedObject.ApplyModifiedProperties();
 
     }
@@ -64,7 +70,7 @@ public class ObjectPoolEditor : Editor
         if (!_object)
         {
             EditorGUIUtility.labelWidth = 200;
-            GUI.color = CustomColors.LightRED;
+            GUI.color = Color.red;
             EditorGUILayout.BeginHorizontal("box");
 
             if (objectPool.debugMode)
@@ -103,13 +109,22 @@ public class ObjectPoolEditor : Editor
 
     }
 
-    void Heading1(string _heading, Color _color, bool _AddSpaces = false)
+    void Heading(string _heading, Color _color, bool _AddSpaces = false)
     {
         if (_AddSpaces) EditorGUILayout.Space();
         GUI.color = _color;
         EditorGUILayout.HelpBox(_heading, MessageType.None);
         GUI.color = defBackgroundColor;
         if (_AddSpaces) EditorGUILayout.Space();
+    }
+
+    void DrawUnderline(Color _color, float _width = 1)
+    {
+        Rect rect = GUILayoutUtility.GetLastRect();
+        GUI.color = _color;
+        GUI.DrawTexture(new Rect(rect.x, rect.yMax, rect.width, _width), Texture2D.whiteTexture);
+        GUI.color = defBackgroundColor;
+        GUILayout.Space(5);
     }
 
 

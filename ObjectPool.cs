@@ -26,7 +26,7 @@ public class ObjectPool : MonoBehaviour
 
     // Singleton
     private static ObjectPool objectPool;
-    public static ObjectPool instance
+    public static ObjectPool Instance
     {
         get
         {
@@ -77,12 +77,12 @@ public class ObjectPool : MonoBehaviour
                 {
                     GameObject newObject = Instantiate(item);
                     newObject.name = item.name;
-                    instance.objects.Add(newObject);
+                    Instance.objects.Add(newObject);
 
-                    if (instance.debugMode)
+                    if (Instance.debugMode)
                     {
-                        instance.objectsNames.Add(newObject.name + "_PRE");
-                        instance.used.Add(0);
+                        Instance.objectsNames.Add(newObject.name + "_PRE");
+                        Instance.used.Add(0);
                     }
                     newObject.SetActive(false);
                 }
@@ -104,36 +104,36 @@ public class ObjectPool : MonoBehaviour
             Debug.Log("<Color=Maroon><b>ObjectPool Error</b></Color>: <Color=Blue>Null object</Color> passed into instantiate");
             return null;
         }
-        for (int i = 0; i < instance.objects.Count; i++)
+        for (int i = 0; i < Instance.objects.Count; i++)
         {
-            if (instance.objects[i])
+            if (Instance.objects[i])
             {
-                if ((!instance.objects[i].activeInHierarchy) && (instance.objects[i].name == _object.name))
+                if ((!Instance.objects[i].activeInHierarchy) && (Instance.objects[i].name == _object.name))
                 {
-                    if (instance.debugMode)
-                        instance.used[i]++;
+                    if (Instance.debugMode)
+                        Instance.used[i]++;
                     if (_activate)
-                        instance.objects[i].SetActive(true);
-                    return instance.objects[i];
+                        Instance.objects[i].SetActive(true);
+                    return Instance.objects[i];
                 }
             }
             else
             {
-                if (instance.debugMode)
+                if (Instance.debugMode)
                 {
-                    Debug.LogWarning("DinoWarning : ObjectPool has null for " + instance.objectsNames[i] + " object in list when called to create " + _object.name);
+                    Debug.LogWarning("ObjectPool warning has null for " + Instance.objectsNames[i] + " object in list when called to create " + _object.name + ", make shure calling ObjectPool.DestroyGameObject() to return objects to the pool");
                 }
             }
         }
 
         GameObject newObject = Instantiate(_object);
         newObject.name = _object.name;
-        instance.objects.Add(newObject);
+        Instance.objects.Add(newObject);
 
-        if (instance.debugMode)
+        if (Instance.debugMode)
         {
-            instance.objectsNames.Add(newObject.name + "_DYN");
-            instance.used.Add(1);
+            Instance.objectsNames.Add(newObject.name + "_DYN");
+            Instance.used.Add(1);
         }
         if (_activate)
             newObject.SetActive(true);
@@ -158,19 +158,19 @@ public class ObjectPool : MonoBehaviour
             return null;
         }
 
-        for (int i = 0; i < instance.objects.Count; i++)
+        for (int i = 0; i < Instance.objects.Count; i++)
         {
-            if (instance.objects[i])
+            if (Instance.objects[i])
             {
-                if ((instance.objects[i].name == _object.name) && (!instance.objects[i].activeInHierarchy))
+                if ((Instance.objects[i].name == _object.name) && (!Instance.objects[i].activeInHierarchy))
                 {
-                    instance.objects[i].transform.position = _position;
-                    instance.objects[i].transform.rotation = _rotation;
-                    if (instance.debugMode)
-                        instance.used[i]++;
+                    Instance.objects[i].transform.position = _position;
+                    Instance.objects[i].transform.rotation = _rotation;
+                    if (Instance.debugMode)
+                        Instance.used[i]++;
                     if (_activate)
-                        instance.objects[i].SetActive(true);
-                    return instance.objects[i];
+                        Instance.objects[i].SetActive(true);
+                    return Instance.objects[i];
                 }
             }
         }
@@ -181,11 +181,11 @@ public class ObjectPool : MonoBehaviour
         newObject.transform.rotation = _rotation;
         if (_activate)
             newObject.SetActive(true);
-        instance.objects.Add(newObject);
-        if (instance.debugMode)
+        Instance.objects.Add(newObject);
+        if (Instance.debugMode)
         {
-            instance.objectsNames.Add(newObject.name + "_DYN");
-            instance.used.Add(1);
+            Instance.objectsNames.Add(newObject.name + "_DYN");
+            Instance.used.Add(1);
         }
         return newObject;
     }
@@ -196,9 +196,9 @@ public class ObjectPool : MonoBehaviour
     /// <param name="_obj">The object to destroy</param>
     public static void DestroyGameObject(GameObject _obj)
     {
-        for (int i = 0; i < instance.objects.Count; i++)
+        for (int i = 0; i < Instance.objects.Count; i++)
         {
-            if (instance.objects[i] && instance.objects[i] == _obj)
+            if (Instance.objects[i] && Instance.objects[i] == _obj)
             {
                 _obj.transform.SetParent(null);
                 _obj.SetActive(false);
