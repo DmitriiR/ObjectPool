@@ -24,6 +24,7 @@ public class ObjectPoolEditor : Editor
     public override void OnInspectorGUI()
     {
         objectPool = (ObjectPool)target;
+        serializedObject.Update();
         defBackgroundColor = GUI.backgroundColor;
         labelWidth = EditorGUIUtility.labelWidth;
         fieldWidth = EditorGUIUtility.fieldWidth;
@@ -53,8 +54,7 @@ public class ObjectPoolEditor : Editor
         if (showInheritedvars)
             DrawDefaultInspector();
 
-        EditorUtility.SetDirty(target);
-        serializedObject.Update();
+        EditorUtility.SetDirty(target);     
         serializedObject.ApplyModifiedProperties();
 
     }
